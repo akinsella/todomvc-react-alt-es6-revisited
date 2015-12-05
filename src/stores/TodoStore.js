@@ -11,9 +11,9 @@ export class TodoStore {
   constructor() {
 
     this.state = {
-      todos: JSON.parse(localStorage.getItem('todomvc.todos')) || [],
-      nowShowing: JSON.parse(localStorage.getItem('todomvc.nowShowing')) || [],
-      editing: JSON.parse(localStorage.getItem('todomvc.editing')) || []
+      todos: this.load('todos', []),
+      nowShowing: this.load('nowShowing', []),
+      editing: this.load('editing', []),
     };
 
     this.bindActions(TodoActions);
@@ -27,16 +27,13 @@ export class TodoStore {
         completed: false
       })
     });
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
   onToggleAll(checked) {
     var updatedTodos = this.state.todos.map(todo => extend(todo, {completed: checked}));
-
     this.setState({todos: updatedTodos});
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
 ;
@@ -46,18 +43,14 @@ export class TodoStore {
             todo !== todoToToggle ?
                 todo : extend({}, todo, {completed: !todo.completed})
     );
-
     this.setState({todos: updatedTodos});
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
   onDestroy(todoToDestroy) {
     var updatedTodos = this.state.todos.filter(todo => todo !== todoToDestroy);
-
     this.setState({todos: updatedTodos});
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
   onSave(command) {
@@ -65,30 +58,32 @@ export class TodoStore {
             todo !== command.todoToSave ?
                 todo : extend({}, command.todoToSave, {title: command.text})
     );
-
     this.setState({todos: updatedTodos});
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
   onClearCompleted() {
     var updatedTodos = this.state.todos.filter(todo => !todo.completed);
-
     this.setState({todos: updatedTodos});
-
-    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
+    this.store('todos', this.state.todos);
   }
 
   onEdit(id) {
     this.setState({editing: id});
-
-    localStorage.setItem('todomvc.editing', JSON.stringify(this.state.editing));
+    this.store('editing', this.state.editing);
   }
 
   onShow(nowShowing) {
     this.setState({nowShowing: nowShowing});
+    this.store('nowShowing', this.state.nowShowing);
+  }
 
-    localStorage.setItem('todomvc.nowShowing', JSON.stringify(this.state.nowShowing));
+  store(key, value) {
+    localStorage.setItem('todomvc.' + key, JSON.stringify(value));
+  }
+
+  load(key, defaultValue) {
+    return JSON.parse(localStorage.getItem('todomvc.' + key)) || defaultValue;
   }
 
 }
