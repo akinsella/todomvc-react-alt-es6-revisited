@@ -11,9 +11,9 @@ export class TodoStore {
   constructor() {
 
     this.state = {
-      todos: [],
-      nowShowing: [],
-      editing: []
+      todos: JSON.parse(localStorage.getItem('todomvc.todos')) || [],
+      nowShowing: JSON.parse(localStorage.getItem('todomvc.nowShowing')) || [],
+      editing: JSON.parse(localStorage.getItem('todomvc.editing')) || []
     };
 
     this.bindActions(TodoActions);
@@ -27,12 +27,16 @@ export class TodoStore {
         completed: false
       })
     });
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
   onToggleAll(checked) {
     var updatedTodos = this.state.todos.map(todo => extend(todo, {completed: checked}));
 
     this.setState({todos: updatedTodos});
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
 ;
@@ -44,12 +48,16 @@ export class TodoStore {
     );
 
     this.setState({todos: updatedTodos});
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
   onDestroy(todoToDestroy) {
     var updatedTodos = this.state.todos.filter(todo => todo !== todoToDestroy);
 
     this.setState({todos: updatedTodos});
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
   onSave(command) {
@@ -59,20 +67,28 @@ export class TodoStore {
     );
 
     this.setState({todos: updatedTodos});
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
   onClearCompleted() {
     var updatedTodos = this.state.todos.filter(todo => !todo.completed);
 
     this.setState({todos: updatedTodos});
+
+    localStorage.setItem('todomvc.todos', JSON.stringify(this.state.todos));
   }
 
   onEdit(id) {
     this.setState({editing: id});
+
+    localStorage.setItem('todomvc.editing', JSON.stringify(this.state.editing));
   }
 
   onShow(nowShowing) {
     this.setState({nowShowing: nowShowing});
+
+    localStorage.setItem('todomvc.nowShowing', JSON.stringify(this.state.nowShowing));
   }
 
 }
