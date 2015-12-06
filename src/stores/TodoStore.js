@@ -6,84 +6,102 @@ import uuid from 'uuid';
 
 import extend from 'object-assign';
 
+import Firebase from 'firebase';
+
 export class TodoStore {
 
   constructor() {
 
     this.state = {
-      todos: this.load('todos', []),
-      nowShowing: this.load('nowShowing', []),
-      editing: this.load('editing', []),
+      todos: []
     };
 
     this.bindActions(TodoActions);
+
+    this.firebase = new Firebase(`https://glaring-heat-6154.firebaseio.com/`);
+
+    var user = this.firebase.getAuth()
+
+    if (user) {
+      this.initState();
+    } else {
+      this.firebase.authWithOAuthPopup("google", (error, authData) => {
+        if (error) {
+          console.log("Login Failed!", error);
+        } else {
+          console.log("Authenticated successfully with payload:", authData);
+
+          this.initState();
+        }
+      }, {remember: "sessionOnly", scope: "email"});
+
+    }
+  }
+
+  initState() {
+    this.todosRef = this.firebase.child('todos');
+
+    this.todoRef = (todo) => this.todosRef.child(todo.key);
+
+    this.todosRef.on('value', snapshot => {
+      const todos = snapshot.val();
+
+      console.log(`[Firebase][onValue] ${JSON.stringify(todos, undefined, 2)}`);
+
+      const todoArray = Object.keys(todos || {}).map(key => {
+        const todo = todos[key];
+        todo.key = key;
+
+        return todo;
+      });
+
+
+      this.setState({todos: todoArray});
+    });
   }
 
   onAddTodo(title) {
-    this.setState({
-      todos: this.state.todos.concat({
-        id: uuid.v4(),
-        title: title,
-        completed: false
-      })
+    this.todosRef.push().set({
+      id: uuid.v4(),
+      title: title,
+      completed: false
     });
-    this.store('todos', this.state.todos);
   }
 
   onToggleAll(checked) {
-    var updatedTodos = this.state.todos.map(todo => extend(todo, {completed: checked}));
-    this.setState({todos: updatedTodos});
-    this.store('todos', this.state.todos);
+    this.state.todos.forEach(todo => {
+      this.todosRef.child(todo.key).update({completed: checked});
+    });
   }
 
-;
-
-  onToggle(todoToToggle) {
-    var updatedTodos = this.state.todos.map(todo =>
-            todo !== todoToToggle ?
-                todo : extend({}, todo, {completed: !todo.completed})
-    );
-    this.setState({todos: updatedTodos});
-    this.store('todos', this.state.todos);
+  onToggle(todo) {
+    this.todoRef(todo).update({completed: !todo.completed});
   }
 
-  onDestroy(todoToDestroy) {
-    var updatedTodos = this.state.todos.filter(todo => todo !== todoToDestroy);
-    this.setState({todos: updatedTodos});
-    this.store('todos', this.state.todos);
+  onDestroy(todo) {
+    this.todoRef(todo).remove();
   }
 
   onSave(command) {
-    var updatedTodos = this.state.todos.map(todo =>
-            todo !== command.todoToSave ?
-                todo : extend({}, command.todoToSave, {title: command.text})
-    );
-    this.setState({todos: updatedTodos});
-    this.store('todos', this.state.todos);
+    this.todoRef(command.todoToSave).update({
+      title: command.text
+    });
   }
 
   onClearCompleted() {
-    var updatedTodos = this.state.todos.filter(todo => !todo.completed);
-    this.setState({todos: updatedTodos});
-    this.store('todos', this.state.todos);
+    this.state.todos.forEach(todo => {
+      if (todo.completed) {
+        this.todoRef(todo).remove();
+      }
+    });
   }
 
   onEdit(id) {
     this.setState({editing: id});
-    this.store('editing', this.state.editing);
   }
 
   onShow(nowShowing) {
     this.setState({nowShowing: nowShowing});
-    this.store('nowShowing', this.state.nowShowing);
-  }
-
-  store(key, value) {
-    localStorage.setItem('todomvc.' + key, JSON.stringify(value));
-  }
-
-  load(key, defaultValue) {
-    return JSON.parse(localStorage.getItem('todomvc.' + key)) || defaultValue;
   }
 
 }
