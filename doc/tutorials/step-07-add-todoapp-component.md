@@ -1,252 +1,8 @@
 
-# XKE - React + Flux
+# TodoMVC - React, Alt, ES6 revisited
 
 
-
-## Tooling
-
-### Requirements
-
- - Node.js 4.x or more recent
- - Webstorm 10 or 11
-
-###Node.js
-
-#### Install
-
-```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
-```
-
-####Configure
-```
-nvm install node
-nvm alias node default
-nvm use default
-```
-
-###Yeoman
-
-####Install
-```
-npm install -g yo
-```
-
-#### Generators
-```
-npm install -g generator-react-webpack@2.2.7 
-npm install -g generator-react-webpack-alt@1.3.2
-```
-
-##Project
-
-### Create Project
-
-#### Run Yeoman
-```
-yo react-webpack-alt
-```
-
-#####Choose option SCSS
-
- - Choose scss
-
-###Open Project
-
-Open WebStorm, then in menu `File`, choose `Open` command, and open directory in which you generated the project.
-
-
-###Configure
-
-####Switch to language level
-
-In WebStorm, you have to switch language level to JSX. You can do this by opening 
-
-
-## Code
-
-###Run code 
-``` 
-npm start
-```
-
-
-### Some changes
-
-- Rename Main.jsx to TodoApp.jsx
-- Rename AppComponent to TodoApp
-
-### Add of a router
-
-The router used is `React-Router`
-
-####Install
-``` 
-npm install -S react-router
-npm install -S history
-``` 
-
-####Configuration
-
-In run.js - Replace this:
-
-```
-// Render the main component into the dom
-ReactDOM.render(<App />, document.getElementById('app'));
-```
-
-By:
-
-```
-import { Router, Route, Link } from 'react-router';
-
-import TodoApp from './TodoApp';
-
-import createBrowserHistory from 'history/lib/createBrowserHistory';
-const history = createBrowserHistory();
-
-let routes = (
-  <Router history={history}>
-    <Route path='/' component={ TodoApp } />
-  </Router>
-);
-
-ReactDOM.render(routes, document.getElementById('app'));
-```
-
-### Actions 
-
-####Scafold
-``` 
-yo react-webpack-alt:action Todo
-```
-
-####Create actions
-Add some actions in constructor of TodoActions:
-
-```
-  this.generateActions(
-    'toggleAll',
-    'toggle',
-    'destroy',
-    'save',
-    'clearCompleted',
-    'edit',
-    'show'
-  );
-}
-```
-
-
-
-### Store
-
-####Scafold
-``` 
-yo react-webpack-alt:store Todo 
-```
-
-####Bind Store to Actions
-
-First, add TodoActions import: 
-
-```
-import TodoActions from '../actions/TodoActions';
-```
-
-Then, add constructor in TodoStore:
-
-```
-constructor() {
-    this.bindActions(TodoActions);
-}
-```
-
-
-#### State
-You need to configure a state in constructor of your store. Here, we need to setup an array that represents todos.
-
-```
-this.state = {
-  todos: []
-};
-```
-
-Finally, we add functions to handle dispatched action events.
-
-First, you need to install `uuid` & `object-assign` dependencies: 
-
-``` 
-npm i -S uuid;
-npm i -S object-assign;
-``` 
-
-and then, import it:
-
-``` 
-import uuid from 'uuid';
-import extend from 'object-assign';
-
-``` 
-
-Then, we add handlers:
-
-```
-onAddTodo(title) {
-  this.setState({
-    todos: this.state.todos.concat({
-      id: uuid.v4(),
-      title: title,
-      completed: false
-    })
-  });
-}
-
-onToggleAll(checked) {
-  var updatedTodos = this.state.todos.map(todo => 
-   extend({}, todo, {completed: checked})
-);
-  this.setState({todos: updatedTodos});
-};
-
-onToggle(todoToToggle) {
-  var updatedTodos = this.state.todos.map(todo =>
-      todo !== todoToToggle ?
-        todo : extend({}, todo, {completed: !todo.completed})
-  );
-  this.setState({todos: updatedTodos});
-}
-
-onDestroy(todoToDestroy) {
-  var updatedTodos = this.state.todos.filter(todo => todo !== todoToDestroy);
-  this.setState({todos: updatedTodos});
-}
-
-onSave(command) {
-  var updatedTodos = this.state.todos.map(todo =>
-      todo !== command.todoToSave ?
-        todo : extend({}, command.todoToSave, {title: command.text})
-  );
-  this.setState({todos: updatedTodos});
-}
-
-onClearCompleted() {
-  var updatedTodos = this.state.todos.filter(todo => !todo.completed);
-  this.setState({todos: updatedTodos});
-}
-
-onEdit(id) {
-  this.setState({editing: id});
-}
-
-onShow(nowShowing) {
-  this.setState({nowShowing: nowShowing});
-}
-```
-
-###Components
-
-####TodoApp
+## Step 6 - Add TodoApp Component
 
 First, we need to make it working.
 
@@ -382,26 +138,6 @@ render() {
   );
 }
 ```  
-
-###Util functions
-
-Create file `src/utils.js` with following content:
-
-``` 
-export function extend() {
-  var newObj = {};
-  for (var i = 0; i < arguments.length; i++) {
-    var obj = arguments[i];
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        newObj[key] = obj[key];
-      }
-    }
-  }
-  
-  return newObj;
-}
-``` 
 
 
 ###Configure Babel
@@ -892,3 +628,22 @@ componentWillUnmount() {
     history.unlisten(this.unlistenHistory);
 }
 ``` 
+
+### Source
+
+####Scafold
+``` 
+yo react-webpack-alt:source Todo 
+```
+
+We need to create a `Source` and connect it to `TodoStore` to handle data fetch.
+
+``` 
+import TodoSource from '../sources/TodoSource';
+import { datasource } from 'alt/utils/decorators';
+
+@datasource(TodoSource)
+
+``` 
+
+
