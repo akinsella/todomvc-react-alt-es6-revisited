@@ -2,38 +2,36 @@
 # TodoMVC - React, Alt, ES6 revisited
 
 
-## Step 1 - A working App
-
-## Tooling
+## Step 1 - Tooling
 
 ### Requirements
 
  - Node.js 4.x or more recent
  - Webstorm 10 or 11
 
-###Node.js
+#### Node.js
 
-#### Install
+##### Install
 
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.29.0/install.sh | bash
 ```
 
-####Configure
+##### Configure
 ```
 nvm install node
 nvm alias node default
 nvm use default
 ```
 
-###Yeoman
+#### Yeoman
 
-####Install
+##### Install
 ```
 npm install -g yo
 ```
 
-#### Generators
+##### Generators
 ```
 npm install -g generator-react-webpack@2.2.7 
 npm install -g generator-react-webpack-alt@1.3.2
