@@ -4,8 +4,6 @@ import TodoActions from '../actions/TodoActions';
 
 import uuid from 'uuid';
 
-import extend from 'object-assign';
-
 import Firebase from 'firebase';
 
 export class TodoStore {
@@ -23,7 +21,7 @@ export class TodoStore {
     var user = this.firebase.getAuth()
 
     if (user) {
-      this.initState();
+      this.listenDbChanges();
     } else {
       this.firebase.authWithOAuthPopup("google", (error, authData) => {
         if (error) {
@@ -31,14 +29,14 @@ export class TodoStore {
         } else {
           console.log("Authenticated successfully with payload:", authData);
 
-          this.initState();
+          this.listenDbChanges();
         }
       }, {remember: "sessionOnly", scope: "email"});
 
     }
   }
 
-  initState() {
+  listenDbChanges() {
     this.todosRef = this.firebase.child('todos');
 
     this.todoRef = (todo) => this.todosRef.child(todo.key);

@@ -63,7 +63,6 @@
     "history": "^1.13.1",
     "node-sass": "^3.3.3",
     "normalize.css": "^3.0.3",
-    "object-assign": "^4.0.1",
     "pluralize": "^1.2.1",
     "react": "^0.14.0",
     "react-addons-test-utils": "^0.14.0",
