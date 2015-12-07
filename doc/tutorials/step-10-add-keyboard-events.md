@@ -2,7 +2,7 @@
 # TodoMVC - React, Alt, ES6 revisited
 
 
-## Step 8 - Add Keyboard events handler
+## Step 10 - Add Keyboard events handler
 
 We also need to handle keyboard events with this code snippet on `Enter`key hit:
 

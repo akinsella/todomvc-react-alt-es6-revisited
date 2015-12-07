@@ -2,7 +2,7 @@
 # TodoMVC - React, Alt, ES6 revisited
 
 
-## Step 15 - Styling Application
+## Step 14 - Styling Application
 
 To correctly style our app, we need to replace following code: 
 

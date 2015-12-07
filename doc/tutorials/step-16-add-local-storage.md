@@ -1,8 +1,8 @@
 
-# TodoMVC - React, Alt, ES6 revisited - Step 2
+# TodoMVC - React, Alt, ES6 revisited
 
 
-## Add of local storage
+## Step 16 - Add of local storage
 
 To add local storage support, you need to add `store` & `load` functions:
 
